@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import FastAPI, APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
@@ -40,7 +41,7 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     db_task = Task(
         name=task.name,
         prompt=task.prompt,
-        owner="system",
+        owner="test", # currently hardcoded
         status=TaskStatus.queued,
         created_at=now,
         scheduled_at=now
@@ -50,14 +51,6 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_task)
     return db_task
-
-# GET /tasks/{task_id}
-@router.get("/tasks/{task_id}", response_model=schemas.TaskRead)
-def get_task(task_id: str, db: Session = Depends(get_db)):
-    task = crud.get_task(db, task_id)
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-    return task
 
 # GET /tasks
 # Optional: ?owner=xyz
@@ -89,5 +82,13 @@ def tasks_in_range(
         raise HTTPException(status_code=400, detail="start must be before end")
     
     return crud.list_tasks_in_range(db, start, end, owner)
+
+# GET /tasks/{task_id}
+@router.get("/tasks/{task_id}", response_model=schemas.TaskRead)
+def get_task(task_id: UUID, db: Session = Depends(get_db)):
+    task = crud.get_task(db, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
 
 app.include_router(router)

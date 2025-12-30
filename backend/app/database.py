@@ -4,7 +4,7 @@ import os
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:postgres@localhost:5432/orchestrator_db"
+    "postgresql://test:test@localhost:5432/orchestrator_db"
 )
 
 engine = create_engine(DATABASE_URL)
