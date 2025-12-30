@@ -18,17 +18,42 @@ interface Task {
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [timeFilter, setTimeFilter] = useState("all");
+
+  async function load() {
+    let url = "http://localhost:8000/tasks";
+
+    if (timeFilter !== "all") {
+      const now = new Date();
+      let start: Date;
+
+      if (timeFilter === "1h") {
+        start = new Date(now.getTime() - 1 * 60 * 60 * 1000);
+      } else if (timeFilter === "24h") {
+        start = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      } else if (timeFilter === "7d") {
+        start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      } else {
+        start = new Date(0);
+      }
+
+      const startISO = start.toISOString();
+      const endISO = now.toISOString();
+
+      url = `http://localhost:8000/tasks/range?start=${startISO}&end=${endISO}`;
+    }
+
+    const res = await fetch(url, {
+      headers: { "X-Owner-Id": "test" }
+    });
+
+    const data = await res.json();
+    setTasks(data);
+  }
 
   useEffect(() => {
-    async function load() {
-      const res = await fetch("http://localhost:8000/tasks", {
-        headers: { "X-Owner-Id": "test" }
-      });
-      const data = await res.json();
-      setTasks(data);
-    }
     load();
-  }, []);
+  }, [timeFilter]);
 
   function formatDate(value?: string | null) {
     if (!value) return "—";
@@ -39,7 +64,7 @@ export default function TasksPage() {
       year: "numeric",
       hour: "numeric",
       minute: "2-digit",
-      second: "2-digit",   // ← add this
+      second: "2-digit",
       timeZoneName: "short"
     });
   }
@@ -47,7 +72,23 @@ export default function TasksPage() {
   return (
     <Layout>
       <div className="tasks-container">
-        <h1 className="tasks-title">All Tasks</h1>
+
+        <div className="tasks-header">
+          <h1 className="tasks-title">Tasks</h1>
+
+          <div className="tasks-filters">
+            <select
+              className="filter-select"
+              value={timeFilter}
+              onChange={(e) => setTimeFilter(e.target.value)}
+            >
+              <option value="all">Any Time</option>
+              <option value="1h">Last 1 hour</option>
+              <option value="24h">Last 24 hours</option>
+              <option value="7d">Last 7 days</option>
+            </select>
+          </div>
+        </div>
 
         <table className="tasks-table">
           <thead>
@@ -69,8 +110,14 @@ export default function TasksPage() {
                 <td>{formatDate(task.scheduled_at)}</td>
                 <td>{formatDate(task.started_at)}</td>
                 <td>{formatDate(task.finished_at)}</td>
-                <td><span className={`task-status status-${task.status}`}>{task.status}</span></td>
-                <td className="output-cell">{task.output ? task.output : "—"}</td>
+                <td>
+                  <span className={`task-status status-${task.status}`}>
+                    {task.status}
+                  </span>
+                </td>
+                <td className="output-cell">
+                  {task.output ? task.output : "—"}
+                </td>
               </tr>
             ))}
           </tbody>

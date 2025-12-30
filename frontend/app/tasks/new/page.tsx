@@ -6,9 +6,13 @@ import { Layout } from "@/components/Layout";
 export default function NewTaskPage() {
   const [name, setName] = useState("");
   const [input, setInput] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);  
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setSubmitting(true);
+    setSubmitted(false);
 
     await fetch("http://localhost:8000/tasks", {
       method: "POST",
@@ -19,7 +23,11 @@ export default function NewTaskPage() {
       body: JSON.stringify({ name, prompt: input })
     });
 
-    window.location.href = "/";
+    setSubmitting(false);
+    setSubmitted(true);
+    setTimeout(() => setSubmitted(false), 2000);
+    setName("");
+    setInput("");
   }
 
   return (
@@ -55,9 +63,14 @@ export default function NewTaskPage() {
             <div className="char-count">{input.length}/500</div>
           </div>
 
-          <button type="submit" className="submit-button">
-            Submit
+          <button type="submit" className="submit-button" disabled={submitting}>
+            {submitting ? "Submitting…" : "Submit"}
           </button>
+          {submitted && (
+            <div className="submitted-message">
+              Task submitted successfully.
+            </div>
+          )}
         </form>
       </div>
     </Layout>
