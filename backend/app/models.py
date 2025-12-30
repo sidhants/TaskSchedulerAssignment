@@ -26,10 +26,10 @@ class Task(Base):
     prompt = Column(Text, nullable=False) # input
     output = Column(Text, nullable=True) # output
 
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    scheduled_at = Column(DateTime(timezone=True), nullable=True)
-    started_at = Column(DateTime(timezone=True), nullable=True)
-    finished_at = Column(DateTime(timezone=True), nullable=True)
+    scheduled_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    created_at   = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    started_at   = Column(DateTime(timezone=True))
+    finished_at  = Column(DateTime(timezone=True))
 
     status = Column(Enum(TaskStatus), default=TaskStatus.queued, nullable=False)
     error = Column(Text, nullable=True)
