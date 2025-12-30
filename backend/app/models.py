@@ -19,7 +19,7 @@ class Task(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
-    owner = Column(String, nullable=True) # user, service, or entity that creates the task
+    owner = Column(String, nullable=True)
 
     parent_task_id = Column(UUID(as_uuid=True), nullable=True) # simple chaining support
     

@@ -8,7 +8,6 @@ TASK_LIMIT = 1
 def find_next_runnable_task(db: Session):
 
     now = datetime.now(timezone.utc)
-
     # select the next runnable task with skip lock setting
     query = (
         select(Task)

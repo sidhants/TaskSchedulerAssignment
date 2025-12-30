@@ -4,22 +4,20 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from typing import Optional
 from backend.orchestrator.orchestrator import Orchestrator
-
+from backend.app.database import Base, engine
 from .database import get_db
 from . import crud, schemas
 from .schemas import TaskCreate, TaskRead
 from .models import Task, TaskStatus
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, Header
 
-from backend.app.database import Base, engine
-
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine) # create tables
 
 app = FastAPI()
 router = APIRouter()
 
-## orchestrator lifecycle
+## Orchestrator lifecycle
 orchestrator = Orchestrator(poll_interval=1)
-
 @app.on_event("startup")
 def start_orchestrator():
     orchestrator.start()
@@ -31,17 +29,27 @@ def stop_orchestrator():
     print("[app] orchestrator stopped")
 
 
+# Helpers
+# fake owner extraxted from header
+async def get_owner(x_owner_id: str = Header(...)) -> str:
+    return x_owner_id
+
+
 ## API endpoints
 # POST /tasks
 @router.post("/tasks", response_model=TaskRead)
-def create_task(task: TaskCreate, db: Session = Depends(get_db)):
+def create_task(
+    task: TaskCreate,
+    owner: str = Depends(get_owner),
+    db: Session = Depends(get_db),
+):
     now = datetime.now(timezone.utc)
     print("DEBUG: using UTC timestamp", now)
 
     db_task = Task(
         name=task.name,
         prompt=task.prompt,
-        owner="test", # currently hardcoded
+        owner=owner,
         status=TaskStatus.queued,
         created_at=now,
         scheduled_at=now
@@ -55,7 +63,10 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
 # GET /tasks
 # Optional: ?owner=xyz
 @router.get("/tasks", response_model=list[schemas.TaskRead])
-def list_tasks(owner: Optional[str] = None, db: Session = Depends(get_db)):
+def list_tasks(
+    owner: str = Depends(get_owner),
+    db: Session = Depends(get_db),
+):
     return crud.list_tasks(db, owner)
 
 # GET /tasks/status
@@ -63,7 +74,7 @@ def list_tasks(owner: Optional[str] = None, db: Session = Depends(get_db)):
 @router.get("/tasks/status", response_model=list[schemas.TaskRead])
 def tasks_by_status(
     status: TaskStatus,
-    owner: Optional[str] = None,
+    owner: str = Depends(get_owner),
     db: Session = Depends(get_db)
 ):
     return crud.list_tasks_by_status(db, status, owner)
@@ -75,7 +86,7 @@ def tasks_by_status(
 def tasks_in_range(
     start: datetime,
     end: datetime,
-    owner: Optional[str] = None,
+    owner: str = Depends(get_owner),
     db: Session = Depends(get_db)
 ):
     if start >= end:
@@ -85,10 +96,18 @@ def tasks_in_range(
 
 # GET /tasks/{task_id}
 @router.get("/tasks/{task_id}", response_model=schemas.TaskRead)
-def get_task(task_id: UUID, db: Session = Depends(get_db)):
+def get_task(
+    task_id: UUID,
+    owner: str = Depends(get_owner),
+    db: Session = Depends(get_db),
+):
     task = crud.get_task(db, task_id)
     if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
+        raise HTTPException(status_code=404, detail="Task id not found")
+
+    if task.owner != owner:
+        raise HTTPException(status_code=403, detail="Task access denied")
+
     return task
 
 app.include_router(router)

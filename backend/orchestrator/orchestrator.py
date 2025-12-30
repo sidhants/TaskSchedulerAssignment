@@ -7,7 +7,7 @@ from backend.app.database import SessionLocal
 from backend.app.models import Task, TaskStatus
 from backend.scheduler.scheduler import find_next_runnable_task
 
-# Orchestrator class with scheduler and executor (single threaded loops)
+# Orchestrator class with scheduler, executor
 class Orchestrator:
     def __init__(self, poll_interval=1):
         self.poll_interval = poll_interval
@@ -68,11 +68,13 @@ class Orchestrator:
 
     # execute task
     def run_task(self, task):
-        # simple blocking mock is fine for take-home
+        print(f"[orchestrator] started task {task.id} ({task.status})")
+        # mocked api LLM response
+        # can be replaced with actual LLM API call and made async
         time.sleep(0.5)
-        return {"echo": task.prompt}
+        return {"echo": "Mock LLM response: " + task.prompt}
 
-    # start threads
+    # start
     def start(self):
         if self.scheduler_thread and self.scheduler_thread.is_alive():
             return
@@ -95,7 +97,7 @@ class Orchestrator:
         self.scheduler_thread.start()
         self.executor_thread.start()
 
-    # stop threads
+    # stop
     def stop(self):
         self._stop.set()
         if self.scheduler_thread:
