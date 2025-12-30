@@ -1,26 +1,241 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ----------------------------- */
+/* GLOBAL PAGE BACKGROUND        */
+/* ----------------------------- */
+.page {
+  min-height: 100vh;
+  background: #f7f9fa;
+  font-family: sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ----------------------------- */
+/* HEADER                        */
+/* ----------------------------- */
+.layout-header {
+  background: #2563eb;
+  border-bottom: 1px solid #d0d7e2;
+  width: 100%;
+  height: 140px;
+  display: flex;
+  align-items: center;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.layout-header-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.layout-title {
+  color: #e5e7eb;
+  font-weight: 600;
+  font-size: 2rem;
+}
+
+.layout-nav {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.layout-nav a {
+  color: #e5e7eb;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+/* ----------------------------- */
+/* CONTENT WRAPPER               */
+/* ----------------------------- */
+.content {
+  max-width: 1080px;   /* ← wider */
+  margin: 0 auto;
+  padding: 48px 24px;
+  display: block;
+}
+
+/* ----------------------------- */
+/* CREATE TASK PAGE              */
+/* ----------------------------- */
+.create-task-container {
+  text-align: center;
+}
+
+.create-task-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 48px;
+  color: #1a1a1a;
+}
+
+.create-task-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.form-group {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.prompt-group {
+  margin-top: 16px;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #d0d7e2;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+}
+
+.form-textarea {
+  resize: vertical;
+}
+
+.char-count {
+  font-size: 0.875rem;
+  color: #6a6a6a;
+  align-self: flex-end;
+}
+
+.submit-button {
+  background: #2563eb;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 24px;
+}
+
+.submit-button:hover {
+  background: #1e4fcf;
+}
+
+.home-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px; /* reduced from 80px */
+  text-align: center;
+}
+
+.home-image {
+  width: 260px;       /* clean, modern size */
+  height: auto;
+  margin: 0 auto 48px auto; /* center + spacing */
+  display: block;
+}
+
+.home-title {
+  font-size: 2.5rem;  /* large and bold */
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+
+.home-subtitle {
+  font-size: 1.5rem;  /* also large */
+  font-weight: 500;
+  color: #4a4a4a;
+}
+
+/* ----------------------------- */
+/* TASK TABLE PAGE               */
+/* ----------------------------- */
+.tasks-container {
+  max-width: 1080px;   /* ← wider */
+  margin: 0 auto;
+  padding: 40px 24px;
+  display: block;
+}
+
+.tasks-table {
+  width: 100%;          /* ← forces table to fit container */
+  table-layout: fixed;  /* ← prevents columns from expanding */
+  margin: 0 auto;
+}
+
+.tasks-title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+/* HEADER CELLS */
+.tasks-table th {
+  background: #f3f4f6;
+  text-align: left;
+  padding: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+  border: 1px solid #d0d7e2;
+}
+
+/* BODY CELLS */
+.tasks-table td {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  vertical-align: top;
+  color: #1a1a1a;
+}
+
+/* WRAPPING FOR PROMPT + OUTPUT */
+.prompt-cell,
+.output-cell {
+  max-width: 400px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* STATUS BADGES */
+.task-status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.status-queued {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.status-running {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-completed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-failed {
+  background: #fee2e2;
+  color: #991b1b;
 }

@@ -1,28 +1,18 @@
-import { api } from "@/lib/api";
+import { Layout } from "@/components/Layout";
 
-export default async function TaskListPage() {
-  const tasks = await api("/tasks");
-
+export default function HomePage() {
   return (
-    <div>
-      <h1>Tasks</h1>
+    <Layout>
+      <div className="home-container">
+        <img
+          src="/home.png"
+          alt="image"
+          className="home-image"
+        />
 
-      <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-        <a href="/new">Create New Task</a>
-        <a href="/">Refresh</a>
+        <h1 className="home-title">Welcome</h1>
+        <p className="home-subtitle">Try Our Awesome Service!</p>
       </div>
-
-      {tasks.length === 0 && <p>No tasks yet.</p>}
-
-      <ul style={{ marginTop: 24 }}>
-        {tasks.map((t: any) => (
-          <li key={t.id}>
-            <a href={`/tasks/${t.id}`}>
-              {t.name} — {t.status}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
+    </Layout>
   );
 }

@@ -1,13 +1,12 @@
 import threading
 import time
-import json
+import random
 from queue import Queue, Empty
 from datetime import datetime, timezone
 from backend.app.database import SessionLocal
 from backend.app.models import Task, TaskStatus
 from backend.scheduler.scheduler import find_next_runnable_task
 
-# Orchestrator class with scheduler, executor
 class Orchestrator:
     def __init__(self, poll_interval=1):
         self.poll_interval = poll_interval
@@ -16,25 +15,24 @@ class Orchestrator:
         self.scheduler_thread = None
         self.executor_thread = None
 
-    # scheduler loop
     def scheduler_loop(self):
         while not self._stop.is_set():
-
             db = SessionLocal()
             try:
                 task = find_next_runnable_task(db)
                 if task:
-                    print(f"[orchestrator] claimed task {task.id}")
+                    task.scheduled_at = datetime.now(timezone.utc)
+                    task.status = TaskStatus.queued
+                    db.add(task)
+                    db.commit()
                     self.queue.put(task.id)
             finally:
                 db.close()
 
             self._stop.wait(self.poll_interval)
 
-    # executor loop
     def executor_loop(self):
         while not self._stop.is_set():
-
             try:
                 task_id = self.queue.get(timeout=0.5)
             except Empty:
@@ -44,37 +42,37 @@ class Orchestrator:
                 db = SessionLocal()
                 try:
                     task = db.query(Task).filter(Task.id == task_id).one()
+
+                    task.status = TaskStatus.running
+                    task.started_at = datetime.now(timezone.utc)
+                    db.add(task)
+                    db.commit()
+
                     try:
                         result = self.run_task(task)
-                        # mark completed
                         task.status = TaskStatus.completed
-                        task.output = json.dumps(result)
+                        task.output = result["MockResponse"]
                         task.finished_at = datetime.now(timezone.utc)
                     except Exception as e:
-                        # mark failed
                         task.status = TaskStatus.failed
                         task.error = str(e)
                         task.finished_at = datetime.now(timezone.utc)
 
                     db.add(task)
                     db.commit()
-                    print(f"[orchestrator] finished task {task.id} ({task.status})")
-
                 finally:
                     db.close()
-
             finally:
                 self.queue.task_done()
 
-    # execute task
     def run_task(self, task):
         print(f"[orchestrator] started task {task.id} ({task.status})")
-        # mocked api LLM response
-        # can be replaced with actual LLM API call and made async
-        time.sleep(0.5)
-        return {"echo": "Mock LLM response: " + task.prompt}
+        delay = random.uniform(1, 3)
+        time.sleep(delay)
+        return {
+            "MockResponse": "This is a mocked LLM response for query " + task.prompt
+        }
 
-    # start
     def start(self):
         if self.scheduler_thread and self.scheduler_thread.is_alive():
             return
@@ -97,7 +95,6 @@ class Orchestrator:
         self.scheduler_thread.start()
         self.executor_thread.start()
 
-    # stop
     def stop(self):
         self._stop.set()
         if self.scheduler_thread:
