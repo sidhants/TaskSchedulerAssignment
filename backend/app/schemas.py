@@ -19,6 +19,5 @@ class TaskRead(BaseModel):
     finished_at: Optional[datetime]
     output: Optional[str]
     error: Optional[str]
-    parent_task_id: Optional[UUID]
 
     model_config = {"from_attributes": True}

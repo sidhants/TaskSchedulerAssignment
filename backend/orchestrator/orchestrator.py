@@ -7,6 +7,7 @@ from backend.app.database import SessionLocal
 from backend.app.models import Task, TaskStatus
 from backend.scheduler.scheduler import find_next_runnable_task
 
+# Orchestrator - runs executor and scheduler threads and manages task queue
 class Orchestrator:
     def __init__(self, poll_interval=1):
         self.poll_interval = poll_interval

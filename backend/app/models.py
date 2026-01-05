@@ -21,8 +21,6 @@ class Task(Base):
     name = Column(String, nullable=False)
     owner = Column(String, nullable=True)
 
-    parent_task_id = Column(UUID(as_uuid=True), nullable=True) # simple chaining support
-    
     prompt = Column(Text, nullable=False) # input
     output = Column(Text, nullable=True) # output
 

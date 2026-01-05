@@ -39,12 +39,13 @@ def stop_orchestrator():
 
 
 # Helpers
-# fake owner extraxted from header
+# owner extraxted from header
 async def get_owner(x_owner_id: str = Header(...)) -> str:
     return x_owner_id
 
 
 ## API endpoints
+
 # POST /tasks
 @router.post("/tasks", response_model=TaskRead)
 def create_task(
@@ -77,16 +78,6 @@ def list_tasks(
     db: Session = Depends(get_db),
 ):
     return crud.list_tasks(db, owner)
-
-# GET /tasks/status
-# Optional: ?owner=xyz
-@router.get("/tasks/status", response_model=list[schemas.TaskRead])
-def tasks_by_status(
-    status: TaskStatus,
-    owner: str = Depends(get_owner),
-    db: Session = Depends(get_db)
-):
-    return crud.list_tasks_by_status(db, status, owner)
 
 # GET /tasks/range
 # Optional: ?owner=xyz
