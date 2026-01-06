@@ -1,5 +1,9 @@
 ## Mini LLM Task Orchestrator Service
 
+GIT Repo - https://github.com/sidhants/TaskSchedulerAssignment 
+
+Demo Video added to repo.
+
 ## Prerequisites
 
 1. Follow instructions in README-BACKEND for postgresql, server setup.
@@ -47,11 +51,15 @@ Technolgies
 Walkthrough
 
 • Implemented REST endpoints for creating and retrieving tasks, including time‑range filtering.
+
 • Introduced resource‑based ownership, where each request includes an owner header. Only the owner can view their tasks. This pattern can easily extend to update/delete operations in the future.
+
 • Designed and built a simple orchestrator service with two threads:
 	◦ Scheduler — selects the next runnable task
 	◦ Executor — runs the task and updates its status
+
 • The scheduler uses a producer–consumer model with FIFO ordering. The design is intentionally simple but can be expanded to multi‑threaded or distributed execution.
+
 • LLM calls are currently mocked, but the run_task method is structured so real LLM calls can be plugged in without changing the orchestration logic.
 
 ### FRONTEND WALKTHROUGH
@@ -68,10 +76,15 @@ Walkthrough
 • Built a single interaction page where users can:
 	◦ Create a new task
 	◦ View all existing tasks
+
 • Added real‑time filtering by time ranges (1 hour, 24 hours, 7 days, all time).
+
 • Implemented a clean table UI showing task name, status, timestamps, prompt, and output, with action controls where applicable.
+
 • Added success notifications and disabled button states for better user feedback.
+
 • Task Chaining is supported via separate buttons in the table for completed tasks (uses previous output as new prompt).
+
 • Kept the UI minimal and readable, with API calls isolated from UI components for separation of concerns.
 
 ### FUTURE IMPROVEMENTS (~1 day)
