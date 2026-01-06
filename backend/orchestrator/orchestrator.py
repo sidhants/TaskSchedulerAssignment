@@ -71,7 +71,7 @@ class Orchestrator:
         delay = random.uniform(1, 3)
         time.sleep(delay)
         return {
-            "MockResponse": "This is a mocked LLM response for query " + task.prompt
+            "MockResponse": "LLM response for \"" + task.prompt + "\""
         }
 
     def start(self):

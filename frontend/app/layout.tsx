@@ -1,11 +1,11 @@
-import "./globals.css";   // <-- THIS LINE IS REQUIRED
+import "./globals.css";
 
 export const metadata = {
-  title: "Mini LLM Orchestrator",
+  title: "Mini LLM Orchestrator Service",
   description: "Task orchestration UI"
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>{children}</body>
