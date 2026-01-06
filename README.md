@@ -33,9 +33,9 @@ Open http://localhost:3000/
 
 ### APPROACH
 
-The goal was to build a minimal but complete frontend and backend that satisfies the core requirements of creating, scheduling, and viewing tasks, while keeping the architecture clean, scalable, and easy to extend. The focus was on correctness, simplicity, and clarity to achieve the minimum viable product given the time constraints.
+The goal was to build a minimal but complete frontend and backend that satisfieds the core functionality of creating, scheduling, and viewing tasks, while keeping the architecture clean, scalable, and easy to extend. The focus was on correctness, simplicity, and clarity to achieve the minimum viable product given the time constraints.
 
-### WHY I CHOSE THIS APPROACH (Concise)
+### REASONS FOR APPROACH
 
 I chose this approach to keep the system simple and easy to review. A single‑page frontend makes the entire workflow visible without navigating through multiple screens. On the backend, using PostgreSQL row‑level locking and a scheduler/executor loop enables safe FIFO task execution and provides a clean path to future parallelism. The overall design is intentionally lightweight, easy to run locally, and structured so real LLM calls or additional orchestration features can be added without changing the core architecture.
 
